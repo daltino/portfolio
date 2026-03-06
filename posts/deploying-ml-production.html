@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Deploying ML Models to Production</title>
+  <link rel="stylesheet" href="../assets/style.css" />
+</head>
+<body>
+<nav>
+  <a class="nav-logo" href="../index.html">$ ~/portfolio</a>
+  <div class="nav-links">
+    <a href="../index.html#about">About</a>
+    <a href="../index.html#writing">Writing</a>
+    <a href="mailto:dalton.b.whyte@gmail.com">Contact</a>
+  </div>
+</nav>
+<div class="article-hero">
+  <div class="article-cat">MLOps</div>
+  <h1>Deploying ML Models to Production: What No One Tells You</h1>
+  <div class="article-byline">
+    <span class="byline-author">Dalton Whyte</span>
+    <span class="byline-date">February 2025</span>
+    <span class="byline-read">7 min read</span>
+  </div>
+</div>
+<div class="article-body">
+  <p>The notebook works perfectly. The model metrics look great. You're ready to ship. Then you hit production and everything breaks in ways you didn't anticipate. If this sounds familiar, you're not alone — it's the most common story in applied ML.</p>
+
+  <p>Here's everything I wish I'd known before my first production ML deployment.</p>
+
+  <h2>The Training-Serving Skew Problem</h2>
+  <p>The single most common production ML failure is training-serving skew: the data your model sees at inference time doesn't look like the data it trained on. This can happen because of preprocessing inconsistencies, data pipeline differences, or slow distribution drift over time.</p>
+
+  <pre><code># Training preprocessing
+X_train = (X_train - X_train.mean()) / X_train.std()
+
+# Serving preprocessing (WRONG — using training stats at inference time)
+X_input = (X_input - X_input.mean()) / X_input.std()
+
+# Serving preprocessing (CORRECT — use saved training statistics)
+X_input = (X_input - saved_mean) / saved_std</code></pre>
+
+  <p>Always serialize your preprocessing parameters alongside your model. Never recompute statistics from the incoming data at inference time.</p>
+
+  <h2>Model Versioning Is Non-Negotiable</h2>
+  <p>Treat your models like software releases. Every model that goes to production should have a version number, a corresponding dataset snapshot, a performance benchmark, and a git commit hash for the training code. Without this, debugging production issues becomes archaeology.</p>
+
+  <h2>Latency Is a Feature</h2>
+  <p>A model that takes 800ms to respond might be technically accurate but practically useless. Before deploying, profile your full inference path: preprocessing, model forward pass, postprocessing, network overhead. Know your p50, p95, and p99 latency numbers before your users do.</p>
+
+  <blockquote>Your model's accuracy is irrelevant if users have moved on before it responds.</blockquote>
+
+  <h2>Monitoring: More Than Loss Metrics</h2>
+  <p>Log everything you can afford to log. At minimum, you want:</p>
+  <ul>
+    <li>Input feature distributions over time</li>
+    <li>Prediction score distributions</li>
+    <li>Business outcome metrics (not just model metrics)</li>
+    <li>Inference latency percentiles</li>
+    <li>Error rates and fallback triggers</li>
+  </ul>
+
+  <h2>Shadow Mode and Canary Deployments</h2>
+  <p>Never replace a production model in one shot. Route a small percentage of traffic to your new model in shadow mode — log its predictions without using them — before giving it real exposure. Canary deployments, which gradually shift traffic, are even safer. The cost of getting this wrong is your production SLA.</p>
+
+  <h2>Plan for Model Failure</h2>
+  <p>Your model will fail. Plan what happens when it does. A good fallback strategy might be a simpler heuristic model, a cached response, or a graceful degradation that tells users the feature is temporarily unavailable. Fail loudly and safely, not silently and catastrophically.</p>
+
+  <p>Deploying ML to production is a discipline that takes years to get good at. But the engineers who master it — who can take a research-grade model and turn it into a reliable production system — are among the most valuable in the industry.</p>
+</div>
+<div class="article-nav">
+  <a class="back-link" href="../index.html#writing">← Back to all posts</a>
+  <a class="back-link" href="time-series-deep-learning.html">Next: Time Series →</a>
+</div>
+</body>
+</html>

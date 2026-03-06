@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Real-Time Audio Processing with ML</title>
+  <link rel="stylesheet" href="../assets/style.css" />
+</head>
+<body>
+<nav>
+  <a class="nav-logo" href="../index.html">$ ~/portfolio</a>
+  <div class="nav-links">
+    <a href="../index.html#about">About</a>
+    <a href="../index.html#writing">Writing</a>
+    <a href="mailto:dalton.b.whyte@gmail.com">Contact</a>
+  </div>
+</nav>
+<div class="article-hero">
+  <div class="article-cat">Audio Intelligence</div>
+  <h1>Real-Time Audio Processing with ML: Architecture and Tradeoffs</h1>
+  <div class="article-byline">
+    <span class="byline-author">Dalton Whyte</span>
+    <span class="byline-date">June 2025</span>
+    <span class="byline-read">7 min read</span>
+  </div>
+</div>
+<div class="article-body">
+  <p>Real-time audio ML is one of the most technically demanding domains in applied machine intelligence. You're dealing with strict latency budgets, continuous data streams, and models that need to be both accurate and fast — often on consumer hardware. Here's how I think about the architecture and tradeoffs.</p>
+
+  <h2>The Latency Budget</h2>
+  <p>Human perception of audio latency becomes noticeable around 20-40ms. For applications like noise cancellation, voice enhancement, or real-time transcription, you need to process audio chunks, run inference, and output results within that window. This is non-negotiable — it shapes every architectural decision downstream.</p>
+
+  <pre><code>SAMPLE_RATE = 16000      # 16kHz audio
+CHUNK_MS = 20            # 20ms chunks
+CHUNK_SAMPLES = int(SAMPLE_RATE * CHUNK_MS / 1000)  # 320 samples per chunk
+
+# Your model must process 320 samples and return in < 20ms
+# including preprocessing, inference, and postprocessing</code></pre>
+
+  <h2>Model Size vs. Latency: The Core Tradeoff</h2>
+  <p>Larger models are more accurate. Smaller models are faster. For real-time audio, you're almost always on the smaller side of this curve. Techniques that help:</p>
+  <ul>
+    <li><strong>Quantization</strong>: INT8 inference is 2-4x faster than FP32 with minimal accuracy loss for audio tasks</li>
+    <li><strong>Pruning</strong>: Remove attention heads or neurons that contribute least to accuracy</li>
+    <li><strong>Knowledge distillation</strong>: Train a small "student" model to mimic a large "teacher" model</li>
+    <li><strong>Streaming architectures</strong>: Design models that process incremental input rather than fixed-length windows</li>
+  </ul>
+
+  <h2>Streaming vs. Batch Inference</h2>
+  <p>Batch inference processes a complete audio segment at once. Streaming inference processes each new chunk while maintaining a hidden state from previous chunks. Streaming is harder to implement but essential for low-latency applications. RNNs and causal transformers support streaming naturally; standard transformers with full attention do not.</p>
+
+  <blockquote>A causal architecture constraint isn't a limitation — it's a latency guarantee. Design for streaming from the beginning.</blockquote>
+
+  <h2>The Ring Buffer Pattern</h2>
+  <p>For real-time audio, the ring buffer is your friend. Audio arrives continuously; your model processes it in chunks; there's always a size mismatch. A ring buffer decouples audio capture from model inference, absorbing the timing jitter that makes real-time audio hard.</p>
+
+  <pre><code>from collections import deque
+import numpy as np
+
+class AudioBuffer:
+    def __init__(self, max_samples):
+        self.buffer = deque(maxlen=max_samples)
+
+    def push(self, chunk):
+        self.buffer.extend(chunk)
+
+    def pop_chunk(self, n):
+        if len(self.buffer) < n:
+            return None
+        return np.array([self.buffer.popleft() for _ in range(n)])</code></pre>
+
+  <h2>Hardware Considerations</h2>
+  <p>For edge deployment (mobile, embedded), consider ONNX Runtime or TensorFlow Lite for model serving. Both have audio-optimized backends and support quantized inference. Profile on the actual target hardware — desktop benchmarks are meaningless for mobile latency.</p>
+
+  <h2>The Most Common Mistake</h2>
+  <p>Building an accurate model first and worrying about latency later. By the time you discover your model is too slow for real-time use, you've invested in an architecture that's hard to make faster. Design for your latency budget from day one, then maximize accuracy within that constraint.</p>
+</div>
+<div class="article-nav">
+  <a class="back-link" href="../index.html#writing">← Back to all posts</a>
+  <a class="back-link" href="african-ai-opportunity.html">Next: Africa's AI Moment →</a>
+</div>
+</body>
+</html>

@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Closing the Gap: ML Research to Production</title>
+  <link rel="stylesheet" href="../assets/style.css" />
+</head>
+<body>
+<nav>
+  <a class="nav-logo" href="../index.html">$ ~/portfolio</a>
+  <div class="nav-links">
+    <a href="../index.html#about">About</a>
+    <a href="../index.html#writing">Writing</a>
+    <a href="mailto:dalton.b.whyte@gmail.com">Contact</a>
+  </div>
+</nav>
+<div class="article-hero">
+  <div class="article-cat">Engineering</div>
+  <h1>Closing the Gap Between ML Research and Production Engineering</h1>
+  <div class="article-byline">
+    <span class="byline-author">Dalton Whyte</span>
+    <span class="byline-date">May 2025</span>
+    <span class="byline-read">6 min read</span>
+  </div>
+</div>
+<div class="article-body">
+  <p>I've lived on both sides of this divide. In graduate school, I wrote papers with carefully controlled experiments, clean datasets, and evaluation protocols designed to isolate one variable at a time. In production, none of those conditions hold. The gap between the two worlds is real, wide, and often painful.</p>
+
+  <p>Here's what I've learned about bridging it intentionally.</p>
+
+  <h2>Why Great Research Becomes Terrible Software</h2>
+  <p>Research optimizes for insight. Production optimizes for reliability. These goals create different habits. Researchers tolerate brittle code because reproducibility matters more than robustness. Engineers tolerate suboptimal algorithms because 80% accuracy that runs at 10ms beats 95% accuracy that runs at 800ms.</p>
+
+  <p>When research code moves to production without being rewritten through an engineering lens, you get systems that are hard to maintain, impossible to monitor, and fragile in unexpected ways.</p>
+
+  <blockquote>Research asks "does this work?" Production asks "does this keep working?" These are different questions, answered by different practices.</blockquote>
+
+  <h2>The Rewrite Fallacy</h2>
+  <p>The naive solution is to "just rewrite it properly." In practice, rewrites from scratch lose the embedded knowledge in the research code — the subtle preprocessing choices, the hyperparameter ranges that were tested, the data cleaning decisions that aren't documented anywhere. A better approach is incremental hardening: take the research code, add tests, add logging, add a proper config system, and refactor in stages.</p>
+
+  <h2>What Academics Need to Learn</h2>
+  <p>If you're coming from research into production ML, the most important habits to build are:</p>
+  <ul>
+    <li><strong>Configuration management.</strong> Nothing should be hardcoded. Use config files or environment variables for everything that might change.</li>
+    <li><strong>Logging and observability.</strong> Your experiment tracking (wandb, mlflow) is not your production monitoring. You need both.</li>
+    <li><strong>Error handling.</strong> Research code fails loudly with stack traces. Production code needs to fail gracefully with meaningful error messages.</li>
+    <li><strong>Versioning discipline.</strong> Model weights, datasets, and code should all be versioned together.</li>
+  </ul>
+
+  <h2>What Engineers Need to Learn</h2>
+  <p>If you're a software engineer picking up ML, the most important mindset shift is tolerating uncertainty. Deterministic systems either work or don't. ML systems work probabilistically — and the right response to a regression isn't always "find the bug and fix it." Sometimes it's "retrain with more data" or "adjust the distribution of the training set." That's a different kind of debugging.</p>
+
+  <h2>The Engineer Who Does Both</h2>
+  <p>The most valuable person in an applied ML team is the one who can read a paper, understand what it's actually proposing, and implement it in a way that will still be running correctly in 18 months. That combination — research literacy plus engineering discipline — is rare and disproportionately impactful.</p>
+
+  <p>My MSc gave me the research literacy. Professional engineering gave me the discipline. The integration of both is what I consider my core professional edge.</p>
+</div>
+<div class="article-nav">
+  <a class="back-link" href="../index.html#writing">← Back to all posts</a>
+  <a class="back-link" href="real-time-audio-ml.html">Next: Real-Time Audio ML →</a>
+</div>
+</body>
+</html>

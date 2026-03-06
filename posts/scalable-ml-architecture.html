@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Designing Scalable ML Architectures</title>
+  <link rel="stylesheet" href="../assets/style.css" />
+</head>
+<body>
+<nav>
+  <a class="nav-logo" href="../index.html">$ ~/portfolio</a>
+  <div class="nav-links">
+    <a href="../index.html#about">About</a>
+    <a href="../index.html#writing">Writing</a>
+    <a href="mailto:dalton.b.whyte@gmail.com">Contact</a>
+  </div>
+</nav>
+<div class="article-hero">
+  <div class="article-cat">Architecture</div>
+  <h1>Designing Scalable ML Architectures: Patterns That Hold Up</h1>
+  <div class="article-byline">
+    <span class="byline-author">Dalton Whyte</span>
+    <span class="byline-date">April 2025</span>
+    <span class="byline-read">8 min read</span>
+  </div>
+</div>
+<div class="article-body">
+  <p>Most ML systems start as notebooks and end up as distributed nightmares. Not because the data science was bad, but because the architecture was never designed to scale. Here are the patterns I've found most reliable for building ML systems that hold up under pressure.</p>
+
+  <h2>Separate Training from Serving</h2>
+  <p>The training environment and serving environment should be treated as completely separate systems. They have different availability requirements, different compute profiles, and different failure modes. Conflating them creates fragile systems where a training run can take down inference, or where inference requirements compromise training flexibility.</p>
+
+  <h2>The Feature Store: Worth the Investment</h2>
+  <p>A feature store is a centralized registry for computed features — values that are expensive to compute and needed by multiple models. Without one, features get recomputed in multiple places, leading to inconsistencies between training and serving (training-serving skew's sneakier cousin).</p>
+
+  <blockquote>A feature store is infrastructure for feature consistency. If you have more than two models sharing features, you need one.</blockquote>
+
+  <h2>Event-Driven Model Triggering</h2>
+  <p>Polling for new data to retrain models is fragile and wasteful. Event-driven architecture — where new data triggers downstream pipeline steps via message queues — is more reliable and easier to reason about. Tools like Kafka, Pub/Sub, or even lightweight Redis streams work well here.</p>
+
+  <pre><code># Event-driven retraining trigger (simplified)
+@app.route('/webhook/data-updated', methods=['POST'])
+def handle_data_update():
+    event = request.json
+    if event['rows_added'] > RETRAIN_THRESHOLD:
+        training_queue.publish({
+            'model_id': event['model_id'],
+            'dataset_version': event['dataset_version'],
+            'triggered_at': datetime.utcnow().isoformat()
+        })
+    return {'status': 'queued'}, 202</code></pre>
+
+  <h2>Model Registry as Truth</h2>
+  <p>Every model that has ever been deployed should live in a model registry with metadata: who trained it, what data it used, what its eval metrics were, and what version of the codebase produced it. MLflow, Weights & Biases, and Vertex AI all offer this. Without it, you're flying blind.</p>
+
+  <h2>Graceful Degradation by Default</h2>
+  <p>Every model call should have a defined fallback. If the model is slow, return a default. If the model is unavailable, serve from cache. If the model's confidence is below a threshold, escalate to a human. Design your fallback strategy before you design your model.</p>
+
+  <h2>The Hardest Part</h2>
+  <p>The hardest part of ML architecture isn't the ML — it's convincing your team to invest in infrastructure before the pain is acute. Feature stores, model registries, and event-driven pipelines feel like over-engineering until the day you desperately need them. Build them early, and they pay compound interest.</p>
+</div>
+<div class="article-nav">
+  <a class="back-link" href="../index.html#writing">← Back to all posts</a>
+  <a class="back-link" href="research-to-production.html">Next: Research to Production →</a>
+</div>
+</body>
+</html>

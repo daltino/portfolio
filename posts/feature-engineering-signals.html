@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Feature Engineering for Audio and Sensor Data</title>
+  <link rel="stylesheet" href="../assets/style.css" />
+</head>
+<body>
+<nav>
+  <a class="nav-logo" href="../index.html">$ ~/portfolio</a>
+  <div class="nav-links">
+    <a href="../index.html#about">About</a>
+    <a href="../index.html#writing">Writing</a>
+    <a href="mailto:dalton.b.whyte@gmail.com">Contact</a>
+  </div>
+</nav>
+<div class="article-hero">
+  <div class="article-cat">Feature Engineering</div>
+  <h1>Feature Engineering for Audio and Sensor Data Using DSP</h1>
+  <div class="article-byline">
+    <span class="byline-author">Dalton Whyte</span>
+    <span class="byline-date">March 2025</span>
+    <span class="byline-read">7 min read</span>
+  </div>
+</div>
+<div class="article-body">
+  <p>Raw signals are almost never what your model needs. Whether you're working with audio, accelerometer data, EEG, radar, or vibration sensors, the path from raw waveform to useful model input runs through signal processing. Here's the toolkit I use.</p>
+
+  <h2>Why Raw Waveforms Are Difficult</h2>
+  <p>A one-second audio clip at 44.1kHz is a 44,100-dimensional vector. Most of those dimensions are correlated, redundant, or irrelevant to your task. Feeding raw waveforms to standard classifiers is possible but sample-inefficient. DSP gives you compact, interpretable, task-relevant representations.</p>
+
+  <h2>The Spectrogram: Your First Tool</h2>
+  <p>The Short-Time Fourier Transform (STFT) slides a window over your signal and computes the frequency content at each position. The result is a 2D time-frequency representation called a spectrogram. This is the go-to representation for audio ML tasks.</p>
+
+  <pre><code>import librosa
+import numpy as np
+
+y, sr = librosa.load('audio.wav', sr=22050)
+
+# Mel spectrogram — frequency axis perceptually scaled
+mel_spec = librosa.feature.melspectrogram(y=y, sr=sr, n_mels=128)
+log_mel = librosa.power_to_db(mel_spec, ref=np.max)
+
+print(log_mel.shape)  # (128, time_frames)</code></pre>
+
+  <h2>MFCCs: Compact Audio Fingerprints</h2>
+  <p>Mel-Frequency Cepstral Coefficients (MFCCs) apply a DCT to the mel spectrogram to produce a compact representation — typically 13 to 40 numbers per frame. MFCCs dominated speech recognition for decades and remain useful for tasks where you need low-dimensional audio features.</p>
+
+  <pre><code>mfccs = librosa.feature.mfcc(y=y, sr=sr, n_mfcc=13)
+# Common practice: use mean and std across time as feature vector
+mfcc_features = np.concatenate([mfccs.mean(axis=1), mfccs.std(axis=1)])</code></pre>
+
+  <h2>Wavelet Transforms for Multi-Scale Analysis</h2>
+  <p>FFT gives you global frequency content. But for non-stationary signals — where the frequency content changes over time — wavelets are more powerful. The Continuous Wavelet Transform (CWT) provides time-frequency resolution that adapts to scale: high temporal resolution at high frequencies, high frequency resolution at low frequencies.</p>
+
+  <blockquote>Wavelets are to non-stationary signals what the FFT is to stationary ones — the right tool for the job when your signal's character changes over time.</blockquote>
+
+  <h2>Sensor Data: IMU and Vibration</h2>
+  <p>For accelerometer and gyroscope data, useful features include RMS energy, zero-crossing rate, dominant frequency bands, spectral entropy, and kurtosis. Kurtosis is particularly useful for detecting impulsive events like mechanical faults — it's sensitive to spike patterns that energy-based metrics miss.</p>
+
+  <pre><code>from scipy import stats
+
+def sensor_features(segment):
+    return {
+        'rms': np.sqrt(np.mean(segment**2)),
+        'kurtosis': stats.kurtosis(segment),
+        'zero_crossing_rate': np.mean(np.diff(np.sign(segment)) != 0),
+        'peak_frequency': np.argmax(np.abs(np.fft.rfft(segment))),
+    }</code></pre>
+
+  <h2>End-to-End vs. Handcrafted Features</h2>
+  <p>Modern deep learning can learn features from raw signals end-to-end — especially if you have large datasets and compute. But handcrafted DSP features still win when you have limited data, need interpretability, or want to constrain the hypothesis space with domain knowledge. In practice, the best systems often combine both: a handcrafted frontend feeding into a learned backend.</p>
+
+  <h2>Key Takeaways</h2>
+  <ul>
+    <li>Use mel spectrograms as your default audio representation</li>
+    <li>Use MFCCs when you need low-dimensional, fast-to-compute audio features</li>
+    <li>Reach for wavelets when your signal is non-stationary</li>
+    <li>For vibration/sensor data, kurtosis and spectral entropy are underused gold</li>
+    <li>Combine handcrafted and learned features for data-scarce problems</li>
+  </ul>
+</div>
+<div class="article-nav">
+  <a class="back-link" href="../index.html#writing">← Back to all posts</a>
+  <a class="back-link" href="ai-code-review.html">Next: AI Code Review →</a>
+</div>
+</body>
+</html>

@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Time Series Forecasting with Transformers</title>
+  <link rel="stylesheet" href="../assets/style.css" />
+</head>
+<body>
+<nav>
+  <a class="nav-logo" href="../index.html">$ ~/portfolio</a>
+  <div class="nav-links">
+    <a href="../index.html#about">About</a>
+    <a href="../index.html#writing">Writing</a>
+    <a href="mailto:dalton.b.whyte@gmail.com">Contact</a>
+  </div>
+</nav>
+<div class="article-hero">
+  <div class="article-cat">Deep Learning</div>
+  <h1>Time Series Forecasting with Transformers: A Practical Guide</h1>
+  <div class="article-byline">
+    <span class="byline-author">Dalton Whyte</span>
+    <span class="byline-date">March 2025</span>
+    <span class="byline-read">9 min read</span>
+  </div>
+</div>
+<div class="article-body">
+  <p>Transformers rewrote NLP. Then computer vision. Now they're making serious inroads into time series forecasting — and as someone who came up through signal processing, I find this development both exciting and technically interesting.</p>
+
+  <p>Here's a practical breakdown of what works, what doesn't, and how to think about the problem.</p>
+
+  <h2>Why Time Series Is Hard</h2>
+  <p>Time series data violates the assumptions baked into most ML frameworks. Observations are not independent — each point is causally linked to what came before. Patterns exist at multiple scales simultaneously (hourly, daily, seasonal). And the distribution shifts over time in ways that are hard to detect until you're already wrong.</p>
+
+  <h2>The Transformer Architecture for Sequences</h2>
+  <p>The core insight behind applying transformers to time series is that attention can capture long-range dependencies more efficiently than RNNs. Instead of passing a hidden state through time (which degrades over long sequences), attention directly computes relationships between any two timesteps regardless of how far apart they are.</p>
+
+  <pre><code>import torch
+import torch.nn as nn
+
+class TimeSeriesTransformer(nn.Module):
+    def __init__(self, input_dim, d_model=64, nhead=4, num_layers=2):
+        super().__init__()
+        self.embedding = nn.Linear(input_dim, d_model)
+        encoder_layer = nn.TransformerEncoderLayer(
+            d_model=d_model, nhead=nhead, batch_first=True
+        )
+        self.transformer = nn.TransformerEncoder(encoder_layer, num_layers=num_layers)
+        self.output = nn.Linear(d_model, 1)
+
+    def forward(self, x):
+        x = self.embedding(x)
+        x = self.transformer(x)
+        return self.output(x[:, -1, :])  # predict from last timestep</code></pre>
+
+  <h2>Positional Encoding Matters More Than You Think</h2>
+  <p>Standard sinusoidal positional encodings were designed for discrete token positions in text. For time series with irregular sampling or multi-scale periodicity, you need better options: learnable positional embeddings, or encodings that incorporate the actual timestamp as a continuous feature.</p>
+
+  <h2>Patching: The Trick That Actually Works</h2>
+  <p>Recent work (PatchTST and related models) showed that treating time series segments as patches — analogous to image patches in Vision Transformers — dramatically improves forecasting accuracy. Instead of attending over individual timesteps, the model attends over chunks of the signal. This is computationally cheaper and empirically stronger.</p>
+
+  <blockquote>Treating signal segments as patches is to time series what ViT was to images — a simple idea with outsized impact.</blockquote>
+
+  <h2>When Not to Use a Transformer</h2>
+  <p>Transformers are powerful but not always the right tool. For short sequences (&lt;100 timesteps), simpler models like N-BEATS or even LightGBM with good feature engineering often match transformer performance with a fraction of the compute. Use transformers when you have long sequences, multiple related time series (multivariate), or when you need to capture complex cross-series dependencies.</p>
+
+  <h2>Practical Recommendations</h2>
+  <ul>
+    <li>Start with a strong baseline (ARIMA, Prophet, or XGBoost with lag features) before reaching for transformers</li>
+    <li>Use patching if your series is longer than ~500 timesteps</li>
+    <li>Normalize per series, not globally — time series have very different scales</li>
+    <li>Evaluate on multiple horizons, not just a single forecast length</li>
+  </ul>
+
+  <p>The transformer moment for time series is real, but it rewards engineers who understand both the architecture and the signal structure of their data. That combination is rarer than it should be.</p>
+</div>
+<div class="article-nav">
+  <a class="back-link" href="../index.html#writing">← Back to all posts</a>
+  <a class="back-link" href="feature-engineering-signals.html">Next: Feature Engineering →</a>
+</div>
+</body>
+</html>

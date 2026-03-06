@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Signal Processing Intuitions for ML Engineers</title>
+  <link rel="stylesheet" href="../assets/style.css" />
+</head>
+<body>
+<nav>
+  <a class="nav-logo" href="../index.html">$ ~/portfolio</a>
+  <div class="nav-links">
+    <a href="../index.html#about">About</a>
+    <a href="../index.html#writing">Writing</a>
+    <a href="mailto:dalton.b.whyte@gmail.com">Contact</a>
+  </div>
+</nav>
+
+<div class="article-hero">
+  <div class="article-cat">Signal Processing</div>
+  <h1>Signal Processing Intuitions That Make You a Better ML Engineer</h1>
+  <div class="article-byline">
+    <span class="byline-author">Dalton Whyte</span>
+    <span class="byline-date">February 2025</span>
+    <span class="byline-read">6 min read</span>
+  </div>
+</div>
+
+<div class="article-body">
+  <p>When I started my Master's in Signal Processing and Machine Intelligence, I didn't fully appreciate how deeply the two fields were connected. Now, several years into building ML systems professionally, I can say with confidence: a solid DSP foundation makes you a substantially better ML engineer.</p>
+
+  <p>Here's the conceptual bridge, explained practically.</p>
+
+  <h2>Convolution: The Same Operation Everywhere</h2>
+  <p>In signal processing, a convolution applies a filter to a signal — smoothing it, sharpening edges, extracting frequency content. In deep learning, convolutional layers do the same thing, except the filters are learned from data rather than designed by hand.</p>
+
+  <p>Understanding this equivalence changes how you debug CNNs. When your convolutional layers aren't learning, you ask DSP-style questions: Is the receptive field the right size? Are we losing high-frequency features through downsampling? Are the gradients saturating like a clipped signal?</p>
+
+  <pre><code>import numpy as np
+from scipy.signal import convolve
+
+# Manual convolution — same operation as nn.Conv1d
+signal = np.array([1, 2, 3, 4, 5, 6, 7, 8])
+kernel = np.array([0.25, 0.5, 0.25])  # smoothing filter
+
+smoothed = convolve(signal, kernel, mode='same')
+print(smoothed)  # [1.25, 1.75, 2.5, 3.5, 4.5, 5.5, 6.5, 6.75]</code></pre>
+
+  <h2>The Fourier Transform and Attention</h2>
+  <p>The Fourier Transform decomposes a signal into its frequency components — it tells you which patterns repeat at which scales. Attention mechanisms in transformers do something conceptually similar: they decompose a sequence into a weighted combination of all positions, identifying which parts are related to which.</p>
+
+  <p>Some researchers have made this connection explicit — there are entire papers showing that attention and Fourier-based mixing can be competitive on certain tasks. Knowing the DFT helps you reason about what transformers are actually computing.</p>
+
+  <h2>Noise and Regularization</h2>
+  <p>Signal processing is obsessed with the signal-to-noise ratio. A big chunk of DSP is designing filters that preserve the signal while attenuating noise. In ML, regularization plays the same role — dropout, weight decay, data augmentation are all forms of structured noise management.</p>
+
+  <blockquote>Regularization is to ML what filtering is to DSP: a principled way to separate the signal from the noise.</blockquote>
+
+  <h2>Aliasing and Sampling Theory</h2>
+  <p>The Nyquist theorem says you need to sample at twice the highest frequency in your signal to avoid aliasing. In practice, this concept generalizes: if your training data doesn't adequately cover the distribution of real inputs, your model will "alias" — producing confident but wrong predictions in underrepresented regions.</p>
+
+  <p>This framing has made me much more careful about data collection strategy. It's not just "do we have enough data" — it's "have we sampled the input space at sufficient resolution?"</p>
+
+  <h2>Stationarity and Distribution Shift</h2>
+  <p>In DSP, a stationary signal has statistical properties that don't change over time. In ML, we call the equivalent assumption "i.i.d." — that training and test data come from the same distribution. When that assumption breaks, you get distribution shift, which is one of the most common failure modes in production ML.</p>
+
+  <p>DSP engineers deal with non-stationary signals constantly — speech, EEG, vibration data — and have developed robust tools for handling them. Those tools translate: adaptive filtering becomes online learning; wavelet analysis becomes multi-resolution feature extraction.</p>
+
+  <h2>Practical Takeaways</h2>
+  <ul>
+    <li>Treat convolutional layer design as filter design — use your DSP intuitions</li>
+    <li>Use spectral analysis (FFT) to understand temporal patterns in your data before choosing an architecture</li>
+    <li>Think of regularization as noise floor management</li>
+    <li>Frame distribution shift as non-stationarity — and reach for adaptive methods</li>
+  </ul>
+
+  <p>If you have a DSP background and are moving into ML, don't leave those tools at the door. They're more relevant than most ML curricula acknowledge.</p>
+</div>
+
+<div class="article-nav">
+  <a class="back-link" href="../index.html#writing">← Back to all posts</a>
+  <a class="back-link" href="deploying-ml-production.html">Next: Deploying ML →</a>
+</div>
+</body>
+</html>

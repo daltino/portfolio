@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Using LLMs for Intelligent Code Review</title>
+  <link rel="stylesheet" href="../assets/style.css" />
+</head>
+<body>
+<nav>
+  <a class="nav-logo" href="../index.html">$ ~/portfolio</a>
+  <div class="nav-links">
+    <a href="../index.html#about">About</a>
+    <a href="../index.html#writing">Writing</a>
+    <a href="mailto:dalton.b.whyte@gmail.com">Contact</a>
+  </div>
+</nav>
+<div class="article-hero">
+  <div class="article-cat">AI-Assisted Dev</div>
+  <h1>Using LLMs for Intelligent Code Review: Lessons from the Field</h1>
+  <div class="article-byline">
+    <span class="byline-author">Dalton Whyte</span>
+    <span class="byline-date">April 2025</span>
+    <span class="byline-read">5 min read</span>
+  </div>
+</div>
+<div class="article-body">
+  <p>I spent three months integrating an LLM-powered code review step into a production CI/CD pipeline. Here's an honest account of what worked, what didn't, and what I'd do differently.</p>
+
+  <h2>The Setup</h2>
+  <p>The goal was simple: on every pull request, run an automated review that catches common issues before human reviewers spend time on them. Logic errors, security anti-patterns, performance issues, test coverage gaps. The kind of things that junior engineers miss and senior engineers get tired of catching.</p>
+
+  <h2>What Worked Well</h2>
+  <p>LLMs are surprisingly good at catching certain classes of bugs — off-by-one errors, missing null checks, inconsistent error handling, and insecure string formatting. They also excel at identifying code that "works but is wrong" in subtle ways that static analysis misses.</p>
+
+  <blockquote>LLMs catch the bugs that compilers can't, because they reason about intent, not just syntax.</blockquote>
+
+  <p>For ML-specific code — which was much of our codebase — the LLM reviewer was particularly sharp. It caught training-serving skew risks, identified places where we were leaking label information into features, and flagged incorrect tensor shape assumptions that would only manifest at runtime.</p>
+
+  <h2>What Failed</h2>
+  <p>Two failure modes dominated:</p>
+
+  <ul>
+    <li><strong>False positives on domain-specific patterns.</strong> The model would flag code as suspicious when it was intentional — optimized loops, unconventional but correct signal processing idioms, deliberate type coercions. This created noise that engineers started ignoring.</li>
+    <li><strong>Hallucinated context.</strong> When the model didn't have access to the full codebase, it would sometimes suggest changes that were correct in isolation but broke contracts defined elsewhere. Context window limits are real.</li>
+  </ul>
+
+  <h2>What I'd Do Differently</h2>
+  <p>The biggest lesson: treat AI code review as a specialist, not a generalist. Instead of asking the model to review "everything," route specific concern types to it: security, ML-specific patterns, API contracts. Let it be excellent at those, and don't ask it to replace human judgment on architectural decisions.</p>
+
+  <pre><code># Structured review prompt (better than "review this code")
+prompt = f"""
+You are reviewing ML pipeline code for the following specific concerns only:
+1. Training-serving skew risks
+2. Data leakage between train/test splits
+3. Incorrect use of random seeds
+
+Code diff:
+{diff}
+
+For each concern, respond with: [FOUND / NONE] and brief explanation.
+"""</code></pre>
+
+  <h2>The Right Mental Model</h2>
+  <p>AI code review is best thought of as a fast, tireless, but fallible first pass. It raises flags that a human reviewer then triages. It should reduce cognitive load on reviewers, not replace their judgment. Treat its output like you'd treat a junior colleague's review — valuable, but always verify.</p>
+
+  <p>The teams that get the most value from AI-assisted review are the ones who've been precise about what they're asking the AI to do. Specificity beats generality, every time.</p>
+</div>
+<div class="article-nav">
+  <a class="back-link" href="../index.html#writing">← Back to all posts</a>
+  <a class="back-link" href="scalable-ml-architecture.html">Next: ML Architecture →</a>
+</div>
+</body>
+</html>

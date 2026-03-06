@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>How AI Is Changing Software Development</title>
+  <link rel="stylesheet" href="../assets/style.css" />
+</head>
+<body>
+
+<nav>
+  <a class="nav-logo" href="../index.html">$ ~/portfolio</a>
+  <div class="nav-links">
+    <a href="../index.html#about">About</a>
+    <a href="../index.html#writing">Writing</a>
+    <a href="mailto:dalton.b.whyte@gmail.com">Contact</a>
+  </div>
+</nav>
+
+<div class="article-hero">
+  <div class="article-cat">AI Engineering</div>
+  <h1>How AI Is Fundamentally Changing the Way We Write Software</h1>
+  <div class="article-byline">
+    <span class="byline-author">Dalton Whyte</span>
+    <span class="byline-date">January 2025</span>
+    <span class="byline-read">8 min read</span>
+  </div>
+</div>
+
+<div class="article-body">
+  <p>For decades, software engineering was defined by a simple loop: humans think, humans type, machines execute. That loop is breaking. Not because AI is replacing engineers — but because AI has become a first-class engineering primitive, right alongside databases, APIs, and memory.</p>
+
+  <p>As someone who studied machine intelligence at the graduate level before moving into software engineering, I've had a front-row seat to this shift. And it is not subtle.</p>
+
+  <h2>From Features to Foundations</h2>
+  <p>The first wave of "AI in software" was additive. You built your system, then you added an ML model on top — a recommendation engine here, a fraud classifier there. The underlying software architecture remained unchanged. AI was a plugin.</p>
+
+  <p>What's happening now is architecturally different. Teams are designing systems from the ground up with intelligence as a load-bearing component. The question is no longer "where can we add AI?" but "what should the system learn, and how do we build around that?"</p>
+
+  <blockquote>Intelligence is no longer a feature you ship. It's the material you build with.</blockquote>
+
+  <h2>What This Means Practically</h2>
+  <p>Concretely, I've seen this shift in three areas:</p>
+
+  <h3>1. Intelligent Pipelines</h3>
+  <p>Data pipelines are increasingly augmented with models that make routing, filtering, and transformation decisions dynamically. Instead of hardcoded rules, you have learned policies. The codebase shrinks; the intelligence grows.</p>
+
+  <pre><code># Traditional rule-based routing
+def route_event(event):
+    if event["type"] == "click" and event["value"] > 0.5:
+        return "high_intent_queue"
+    return "default_queue"
+
+# ML-augmented routing
+def route_event(event, model):
+    intent_score = model.predict(event)
+    return "high_intent_queue" if intent_score > threshold else "default_queue"</code></pre>
+
+  <h3>2. AI-Assisted Development</h3>
+  <p>The tools we use to write software are themselves becoming intelligent. Code generation, test synthesis, documentation — these aren't novelties anymore. They're productivity infrastructure. Engineers who treat them as toys will be outpaced by those who integrate them as workflow primitives.</p>
+
+  <h3>3. Observability and Self-Correction</h3>
+  <p>The most forward-looking teams are building systems that monitor their own model performance and trigger retraining or fallback automatically. The system isn't just intelligent — it's self-aware.</p>
+
+  <h2>The Engineer's New Skillset</h2>
+  <p>This doesn't make classical software engineering obsolete. You still need to understand data structures, distributed systems, API design, and performance. What changes is the list of things you also need to understand:</p>
+
+  <ul>
+    <li>Model lifecycle management (training, versioning, deployment, monitoring)</li>
+    <li>Feature engineering and data pipelines</li>
+    <li>The failure modes unique to probabilistic systems</li>
+    <li>When NOT to use a model (often underrated)</li>
+  </ul>
+
+  <p>My signal processing background has been unexpectedly useful here. Working with signals taught me to think about systems in terms of inputs, transformations, and noise — which maps cleanly onto how you reason about ML models in production.</p>
+
+  <h2>Where This Goes</h2>
+  <p>I believe we're heading toward a world where most non-trivial software systems have at least one learned component. Not because AI is a trend, but because many problems that are tedious to solve with rules are genuinely easier to solve with learned approximations.</p>
+
+  <p>The engineers who will shape that world are the ones learning to think in both paradigms — deterministic and probabilistic, rule-based and learned — and knowing which tool to reach for.</p>
+
+  <p>That's the opportunity. And it's wide open.</p>
+</div>
+
+<div class="article-nav">
+  <a class="back-link" href="../index.html#writing">← Back to all posts</a>
+  <a class="back-link" href="signal-processing-ml.html">Next: Signal Processing → ML →</a>
+</div>
+
+</body>
+</html>
